@@ -4,7 +4,6 @@ import "os"
 import "fmt"
 import "bufio"
 import "strings"
-import "io/ioutil"
 
 func help() {
   fmt.Println("This is help. Run 'generator init'")
@@ -52,13 +51,20 @@ func generate(filename string) {
 
   template := make([]string, len(variables))
 
-  for i := 0; i < len(variables); i++ {
-    res := "variable " + variables[i] + " {\n\tdescription = \"<modify>\"\n}\n"
-    template[i] = res
-  }
+// below will be useful when generating teraform files
+  // for i := 0; i < len(variables); i++ {
+  //   res := "variable " + variables[i] + " {\n\tdescription = \"<modify>\"\n}\n"
+  //   template[i] = res
+  // }
+
+
+    for i := 0; i < len(variables); i++ {
+      res := variables[i] + ":\n\t\t\"<modify>\"\n"
+      template[i] = res
+    }
 
   // array has to be converted before parsing to byte[0]
-  output := "\x00" + strings.Join(template, "\x20\x00") // x20 = space and x00 = null
+  output := "\x00" + strings.Join(template, "\x00") // x20 = space and x00 = null
 
   file, err := os.Create(filename)
   if err != nil {
@@ -78,16 +84,24 @@ func generate(filename string) {
 }
 
 func validate(filename string) {
-  file, err := os.Open(filename) // For read access.
+  inputFile, err := os.Open(filename)
   if err != nil {
-  	fmt.Println(err)
+    fmt.Println(err)
   }
-  b, err := ioutil.ReadFile(file)
-  fmt.Print(b)
-  // str := byte(file) // convert content to a 'string'
-  //
-  // fmt.Println(file) // print the content as a 'string'
-}
+  defer inputFile.Close()
+
+  // m = make(map[string]string)
+
+  scanner := bufio.NewScanner(inputFile)
+  //var results []string
+  for scanner.Scan() {
+      // here we need to add checks
+      // we basically want to read each line and add it to a variable
+      fmt.Println("hello")
+      }
+  }
+
+
 
 func main() {
 
