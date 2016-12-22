@@ -28,6 +28,7 @@ func prompt() {
     }
     defer file.Close()
     fmt.Scanf("%s", &inp_aws_region)
+
     generate()
   } else if response == "n" || response == "N" {
     fmt.Println("Aborting.")
