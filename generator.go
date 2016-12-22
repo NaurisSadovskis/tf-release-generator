@@ -15,8 +15,9 @@ func help() {
 func prompt() {
   fmt.Println(filename + " exists! Would you like to overwrite it? (y/n/exit)")
 
-  var input string
+  var input, inp_aws_region string
   fmt.Scanf("%s", &input)
+
   response := input
 
   if response == "y" || response == "Y" {
@@ -26,6 +27,7 @@ func prompt() {
       os.Exit(1)
     }
     defer file.Close()
+    fmt.Scanf("%s", &inp_aws_region)
     generate()
   } else if response == "n" || response == "N" {
     fmt.Println("Aborting.")
@@ -47,14 +49,39 @@ func initialize() {
 
 func generate() {
 
+  // create an array with elements
   variables := []string{"aws_region",
                         "aws_account",
                         "environment",
                         "cost_code",
                         "project",
                         "owner",
-                        "test_user"}
+                        "test_user",
+                      }
 
+
+
+
+  main := map[string]map[string]string{
+      "main": map[string]string {
+          "aws_region"  : inp_aws_region,
+          "aws_account" :"12334",
+          "environment" :"development",
+          "cost_code" :"FB000",
+          "project" :"myprojectos",
+          "owner" :"robp",
+        },
+    "s3": map[string]string {
+          "bucket_name"  :"Hydrogen",
+          "role"  :"Hydrogen",
+        },
+    "ec2": map[string]string {
+          "ec2_key_name"  :"Hydrogen",
+          "ec2_hostname"  :"Hydrogen",
+        },
+      }
+
+  fmt.Println(main)
   template := make([]string, len(variables))
 
 // below will be useful when generating teraform files
@@ -96,14 +123,28 @@ func validate() {
   }
   defer inputFile.Close()
 
-  // m = make(map[string]string)
+  var temp map[string]string
+  temp = make(map[string]string)
 
+  line := 1
   scanner := bufio.NewScanner(inputFile)
   //var results []string
   for scanner.Scan() {
+      if line % 2 == 0 {
+        // key := scanner.Text()
+        temp["value"] = scanner.Text()
+      } else {
+        temp["key"] = scanner.Text()
+        // value := scanner.Text()
+        // m["key"] = "value"
+      }
+
+  fmt.Println(temp)
+
+      line++
       // here we need to add checks
       // we basically want to read each line and add it to a variable
-      fmt.Println("hello")
+      // fmt.Println("hello")
       }
   }
 
