@@ -5,41 +5,47 @@ import "fmt"
 import "bufio"
 import "strings"
 
+var filename string = "variables.tf"
+// const = variable names that can't be changed later
+
 func help() {
   fmt.Println("This is help. Run 'generator init'")
 }
 
-func prompt(filename string) {
+func prompt() {
   fmt.Println(filename + " exists! Would you like to overwrite it? (y/n/exit)")
-  reader := bufio.NewReader(os.Stdin)
-  response, _ := reader.ReadString('\n')
-  if response == "y\n" || response == "Y\n" {
+
+  var input string
+  fmt.Scanf("%s", &input)
+  response := input
+
+  if response == "y" || response == "Y" {
     var file, err = os.Create(filename)
     if err != nil {
       fmt.Println(err)
       os.Exit(1)
     }
     defer file.Close()
-  } else if response == "n\n" || response == "N\n" {
+    generate()
+  } else if response == "n" || response == "N" {
     fmt.Println("Aborting.")
-  } else if response == "exit\n" || response == "EXIT\n" {
+  } else if response == "exit" || response == "EXIT" {
     fmt.Println("Exiting.")
   } else {
-      prompt(filename)
+      prompt()
   }
-  generate(filename)
 }
 
-func initialize(filename string) {
+func initialize() {
   if _, err := os.Stat(filename); os.IsNotExist(err) {
-    generate(filename)
+    generate()
     fmt.Println(filename + " initialized.")
   } else {
-    prompt(filename)
+    prompt()
   }
 }
 
-func generate(filename string) {
+func generate() {
 
   variables := []string{"aws_region",
                         "aws_account",
@@ -83,7 +89,7 @@ func generate(filename string) {
   }
 }
 
-func validate(filename string) {
+func validate() {
   inputFile, err := os.Open(filename)
   if err != nil {
     fmt.Println(err)
@@ -106,13 +112,13 @@ func validate(filename string) {
 func main() {
 
     // version := "0.0.1alpha"
-    filename := "variables.tf"
+    // filename := "variables.tf"
     if len(os.Args) == 1 {
       help()
     } else if os.Args[1] == "init" {
-      initialize(filename)
+      initialize()
     } else if os.Args[1] == "validate" {
-      validate(filename)
+      validate()
     } else {
         fmt.Println(len(os.Args))
     }
